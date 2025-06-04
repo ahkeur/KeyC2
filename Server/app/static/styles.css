@@ -1,0 +1,61 @@
+/* Styles personnalisés */
+.container {
+    max-width: 1200px;
+}
+
+input[type="text"] {
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    width: 100%;
+    transition: all 0.2s;
+}
+
+input[type="text"]:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Animation pour les tokens */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#stage0List > div {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Style pour les tokens blacklistés */
+.token-blacklisted {
+    background-color: #fee2e2;
+    border-color: #ef4444;
+}
+
+/* Style pour les tokens actifs */
+.token-active {
+    background-color: #f0fdf4;
+    border-color: #22c55e;
+}
+
+/* Style pour les tokens en attente */
+.token-pending {
+    background-color: #fef3c7;
+    border-color: #f59e0b;
+}
+
+/* Style pour les blocs de code */
+.font-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.break-all {
+    word-break: break-all;
+} 

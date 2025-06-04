@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeyC2 - Gestionnaire de Tokens</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        // Configuration de Tailwind pour le mode sombre
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            bg: '#1a1a1a',
+                            card: '#2d2d2d',
+                            border: '#404040',
+                            text: '#e5e5e5',
+                            'text-secondary': '#a3a3a3'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .slide-in { animation: slideIn 0.5s ease-out; }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+</head>
+<body class="h-full bg-gray-50 dark:bg-dark-bg transition-colors duration-200">
+    <div class="min-h-full">
+        <!-- Navigation -->
+        <nav class="bg-white dark:bg-dark-card shadow-sm transition-colors duration-200">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 justify-between">
+                    <div class="flex">
+                        <div class="flex flex-shrink-0 items-center">
+                            <svg class="h-8 w-8 text-indigo-600 dark:text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            <span class="ml-2 text-xl font-bold text-gray-900 dark:text-dark-text">KeyC2</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <button id="themeToggle" class="rounded-lg p-2.5 text-sm text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                            <!-- Icône soleil -->
+                            <svg id="themeToggleLightIcon" class="hidden h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"/>
+                            </svg>
+                            <!-- Icône lune -->
+                            <svg id="themeToggleDarkIcon" class="hidden h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <div class="py-10">
+            <header class="mb-8">
+                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                    <h1 class="text-3xl font-bold leading-tight tracking-tight text-gray-900 dark:text-dark-text">Gestionnaire de Tokens</h1>
+                </div>
+            </header>
+
+            <main>
+                <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                    <!-- Upload Section -->
+                    <div class="bg-white dark:bg-dark-card shadow-sm ring-1 ring-gray-900/5 dark:ring-dark-border sm:rounded-xl md:col-span-2 mb-6 fade-in transition-colors duration-200">
+                        <div class="px-3 py-3 sm:p-4">
+                            <div class="max-w-lg">
+                                <h2 class="text-sm font-semibold leading-6 text-gray-900 dark:text-dark-text">Créer un nouveau Stage0</h2>
+                                <p class="mt-0.5 text-xs leading-5 text-gray-600 dark:text-dark-text-secondary">Téléchargez votre charge utile pour générer un stage0 personnalisé.</p>
+                            </div>
+
+                            <!-- Upload de la charge utile -->
+                            <form id="createStage0Form" class="mt-3">
+                                <div class="col-span-full">
+                                    <label for="payloadFile" class="block text-xs font-medium leading-5 text-gray-900 dark:text-dark-text">Charge utile</label>
+                                    <div class="mt-1.5 flex justify-center rounded-lg border border-dashed border-gray-900/25 dark:border-dark-border px-3 py-4">
+                                        <div class="text-center">
+                                            <svg class="mx-auto h-6 w-6 text-gray-300 dark:text-dark-text-secondary" viewBox="0 0 24 24" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 9a.75.75 0 00-1.5 0v2.25H9a.75.75 0 000 1.5h2.25V15a.75.75 0 001.5 0v-2.25H15a.75.75 0 000-1.5h-2.25V9z" clip-rule="evenodd" />
+                                            </svg>
+                                            <div class="mt-1.5 flex text-xs leading-5 text-gray-600 dark:text-dark-text-secondary">
+                                                <label for="payloadFile" class="relative cursor-pointer rounded-md bg-white dark:bg-dark-card font-semibold text-indigo-600 dark:text-indigo-400 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500">
+                                                    <span>Sélectionner un fichier</span>
+                                                    <input id="payloadFile" name="payloadFile" type="file" class="sr-only" accept=".bin,.raw" onchange="updateFileName(this)">
+                                                </label>
+                                            </div>
+                                            <p id="selectedFileName" class="text-xs text-gray-600 dark:text-dark-text-secondary mt-1 hidden"></p>
+                                            <p class="text-xs leading-4 text-gray-600 dark:text-dark-text-secondary mt-0.5">Formats acceptés : BIN, RAW (max 10MB)</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Nom de la clé TPM -->
+                                <div class="mt-4">
+                                    <label for="tpmKeyName" class="block text-xs font-medium leading-5 text-gray-900 dark:text-dark-text">Nom de la clé TPM</label>
+                                    <div class="mt-1.5">
+                                        <input type="text" name="tpmKeyName" id="tpmKeyName" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 dark:text-dark-text shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-dark-border placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-dark-card sm:text-sm sm:leading-6" placeholder="TPM2_STORAGE_SYSTEM_A1B2">
+                                    </div>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-dark-text-secondary">Format recommandé : TPM2_<usage>_<owner>_<random></p>
+                                </div>
+
+                                <!-- Switch pour le mode debug -->
+                                <div class="mt-4">
+                                    <div class="flex items-center">
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="debugMode" name="debugMode" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                            <span class="ml-3 text-xs font-medium text-gray-900 dark:text-dark-text">Mode Debug</span>
+                                        </label>
+                                    </div>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-dark-text-secondary">Active les messages de debug dans le stage0</p>
+                                </div>
+
+                                <!-- Switch pour le mode MultiToken -->
+                                <div class="mt-4">
+                                    <div class="flex items-center">
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" id="multiTokenMode" name="multiTokenMode" class="sr-only peer">
+                                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                            <span class="ml-3 text-xs font-medium text-gray-900 dark:text-dark-text">Mode MultiToken</span>
+                                        </label>
+                                    </div>
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-dark-text-secondary">Active la gestion de plusieurs signatures de tokens pour le stage0</p>
+                                </div>
+
+                                <!-- Menu de configuration MultiToken (caché par défaut) -->
+                                <div id="multiTokenConfig" class="mt-4 hidden">
+                                    <div class="rounded-lg border border-gray-200 dark:border-dark-border p-4">
+                                        <h3 class="text-sm font-medium text-gray-900 dark:text-dark-text mb-4">Configuration MultiToken</h3>
+                                        
+                                        <!-- Switch pour le mode de validation -->
+                                        <div class="mb-4">
+                                            <div class="flex items-center">
+                                                <label class="relative inline-flex items-center cursor-pointer">
+                                                    <input type="checkbox" id="timeBasedMode" name="timeBasedMode" class="sr-only peer">
+                                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                                                    <span class="ml-3 text-xs font-medium text-gray-900 dark:text-dark-text">Mode Temporel</span>
+                                                </label>
+                                            </div>
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-dark-text-secondary">Active la validation basée sur le temps plutôt que sur le nombre d'utilisations</p>
+                                        </div>
+
+                                        <!-- Configuration du mode temporel -->
+                                        <div id="timeBasedConfig" class="mb-4 hidden">
+                                            <label class="block text-xs font-medium text-gray-900 dark:text-dark-text mb-2">Date de validité</label>
+                                            <div class="relative">
+                                                <input type="datetime-local" id="validityDate" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 dark:text-dark-text shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-dark-border placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-dark-card sm:text-sm sm:leading-6" min="">
+                                            </div>
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-dark-text-secondary">Le stage0 accepte les nouvelles signatures jusqu'à cette date</p>
+                                        </div>
+
+                                        <!-- Configuration du mode numérique -->
+                                        <div id="numberBasedConfig" class="mb-4">
+                                            <label class="block text-xs font-medium text-gray-900 dark:text-dark-text mb-2">Nombre d'utilisations</label>
+                                            <div class="relative">
+                                                <input type="number" id="usageCount" min="1" value="1" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 dark:text-dark-text shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-dark-border placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-dark-card sm:text-sm sm:leading-6">
+                                            </div>
+                                            <p class="mt-1 text-xs text-gray-500 dark:text-dark-text-secondary">Nombre maximum d'utilisations du token</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3 flex items-center justify-end gap-x-4">
+                                    <button type="submit" class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors duration-200">
+                                        Créer Stage0
+                                    </button>
+                                </div>
+                            </form>
+
+                            <!-- Séparateur -->
+                            <div class="relative my-6">
+                                <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                    <div class="w-full border-t border-gray-300 dark:border-dark-border"></div>
+                                </div>
+                                <div class="relative flex justify-center">
+                                    <span class="bg-white dark:bg-dark-card px-2 text-xs text-gray-500 dark:text-dark-text-secondary">Configuration du Serveur</span>
+                                </div>
+                            </div>
+
+                            <!-- Configuration du serveur -->
+                            <form id="serverConfigForm" class="mt-3">
+                                <div class="col-span-full">
+                                    <label for="serverUrl" class="block text-xs font-medium leading-5 text-gray-900 dark:text-dark-text">URL du Serveur</label>
+                                    <div class="mt-1.5">
+                                        <input type="url" name="serverUrl" id="serverUrl" class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 dark:text-dark-text shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-dark-border placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 dark:bg-dark-card sm:text-sm sm:leading-6" placeholder="http://192.168.1.100:8000">
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex items-center justify-end gap-x-4">
+                                    <button type="submit" class="rounded-md bg-indigo-600 px-2.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors duration-200">
+                                        Sauvegarder
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Token List Section -->
+                    <div class="bg-white dark:bg-dark-card shadow-sm ring-1 ring-gray-900/5 dark:ring-dark-border sm:rounded-xl md:col-span-2 fade-in transition-colors duration-200">
+                        <div class="px-4 py-6 sm:p-8">
+                            <div class="max-w-2xl">
+                                <h2 class="text-base font-semibold leading-7 text-gray-900 dark:text-dark-text">Tokens Actifs</h2>
+                                <p class="mt-1 text-sm leading-6 text-gray-600 dark:text-dark-text-secondary">Liste des tokens actuellement enregistrés.</p>
+                            </div>
+                            <div class="mt-6 flex justify-between items-center">
+                                <div class="text-sm text-gray-500 dark:text-dark-text-secondary">
+                                    <span id="lastRefreshTime">Dernier rafraîchissement : -</span>
+                                </div>
+                                <button onclick="refreshTokens()" class="inline-flex items-center gap-x-1.5 rounded-md bg-white dark:bg-dark-card px-3 py-2 text-sm font-semibold text-gray-900 dark:text-dark-text shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-dark-border hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                                    <svg class="-ml-0.5 h-5 w-5 text-gray-400 dark:text-dark-text-secondary" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd" />
+                                    </svg>
+                                    Rafraîchir
+                                </button>
+                            </div>
+                            <div class="mt-6">
+                                <div class="flow-root">
+                                    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                        <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+                                            <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 dark:ring-dark-border sm:rounded-lg">
+                                                <table class="min-w-full divide-y divide-gray-300 dark:divide-dark-border">
+                                                    <thead class="bg-gray-50 dark:bg-dark-card">
+                                                        <tr>
+                                                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 dark:text-dark-text sm:pl-6 w-1/6">Token</th>
+                                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-dark-text w-2/5">Signature</th>
+                                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-dark-text w-1/6">Clé de Déchiffrement</th>
+                                                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-dark-text w-1/12">Statut</th>
+                                                            <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6 w-1/12">
+                                                                <span class="sr-only">Actions</span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="divide-y divide-gray-200 dark:divide-dark-border bg-white dark:bg-dark-card" id="tokenList">
+                                                        <!-- Les tokens seront ajoutés ici dynamiquement -->
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        let refreshInterval;
+        const REFRESH_INTERVAL_MS = 30000; // 30 secondes
+
+        // Charger la configuration du serveur au démarrage
+        async function loadServerConfig() {
+            try {
+                const response = await fetch('/config');
+                if (response.ok) {
+                    const config = await response.json();
+                    document.getElementById('serverUrl').value = config.serverUrl;
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement de la configuration:', error);
+            }
+        }
+
+        // Gestionnaire de soumission du formulaire de configuration
+        document.getElementById('serverConfigForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const serverUrl = document.getElementById('serverUrl').value;
+            
+            try {
+                const response = await fetch('/config', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ serverUrl })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erreur lors de la sauvegarde de la configuration');
+                }
+                
+                showNotification('Configuration sauvegardée avec succès !');
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        });
+
+        // Charger la configuration au démarrage
+        loadServerConfig();
+
+        // Fonction pour afficher les notifications
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 p-4 rounded-md shadow-lg transform transition-all duration-500 ease-in-out ${
+                type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+            }`;
+            notification.innerHTML = `
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 ${type === 'success' ? 'text-green-400' : 'text-red-400'}" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium">${message}</p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Fonction pour mettre à jour l'affichage du nom du fichier
+        function updateFileName(input) {
+            const fileNameDisplay = document.getElementById('selectedFileName');
+            if (input.files.length > 0) {
+                const file = input.files[0];
+                fileNameDisplay.textContent = `Fichier sélectionné : ${file.name}`;
+                fileNameDisplay.classList.remove('hidden');
+                
+                // Vérification de la taille du fichier
+                if (file.size > 10 * 1024 * 1024) { // 10MB en bytes
+                    showNotification('Le fichier est trop volumineux. Taille maximale : 10MB', 'error');
+                    input.value = ''; // Réinitialiser l'input
+                    fileNameDisplay.classList.add('hidden');
+                }
+            } else {
+                fileNameDisplay.classList.add('hidden');
+            }
+        }
+
+        // Gestionnaire de soumission du formulaire
+        document.getElementById('createStage0Form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payloadFile = document.getElementById('payloadFile').files[0];
+            if (!payloadFile) {
+                showNotification('Veuillez sélectionner un fichier de charge utile', 'error');
+                return;
+            }
+            try {
+                const formData = new FormData();
+                formData.append('payload', payloadFile);
+                formData.append('tpmKeyName', document.getElementById('tpmKeyName').value);
+                formData.append('debugMode', document.getElementById('debugMode').checked);
+
+                const response = await fetch('/stage0/create', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Erreur lors de la création du stage0');
+                }
+                
+                const data = await response.json();
+                showNotification('Stage0 créé avec succès !');
+                loadTokens();
+                e.target.reset();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        });
+
+        // Fonction pour mettre à jour l'heure du dernier rafraîchissement
+        function updateLastRefreshTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('lastRefreshTime').textContent = `Dernier rafraîchissement : ${timeString}`;
+        }
+
+        // Fonction de rafraîchissement des tokens
+        async function refreshTokens() {
+            try {
+                await loadTokens();
+                updateLastRefreshTime();
+            } catch (error) {
+                console.error('Erreur lors du rafraîchissement:', error);
+                showNotification('Erreur lors du rafraîchissement des tokens', 'error');
+            }
+        }
+
+        // Démarrer le rafraîchissement automatique
+        function startAutoRefresh() {
+            // Arrêter l'intervalle existant s'il y en a un
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+            
+            // Démarrer un nouvel intervalle
+            refreshInterval = setInterval(refreshTokens, REFRESH_INTERVAL_MS);
+        }
+
+        // Arrêter le rafraîchissement automatique
+        function stopAutoRefresh() {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+                refreshInterval = null;
+            }
+        }
+
+        // Modifier la fonction loadTokens pour retourner une promesse
+        async function loadTokens() {
+            try {
+                const response = await fetch('/tokens/');
+                const tokens = await response.json();
+                
+                const tokenList = document.getElementById('tokenList');
+                tokenList.innerHTML = '';
+                
+                tokens.forEach(token => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150';
+                    row.innerHTML = `
+                        <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-dark-text sm:pl-6">${token.token}</td>
+                        <td class="px-3 py-4 text-sm text-gray-500 dark:text-dark-text-secondary font-mono break-all">
+                            <div class="max-h-20 overflow-y-auto">
+                                ${token.signedToken || '-'}
+                            </div>
+                        </td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-dark-text-secondary font-mono">${token.decryptionKey || '-'}</td>
+                        <td class="whitespace-nowrap px-3 py-4 text-sm">
+                            <span class="inline-flex items-center rounded-md ${token.isBlacklisted ? 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 ring-red-600/20' : token.isRegistered ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 ring-green-600/20' : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 ring-yellow-600/20'} px-2 py-1 text-xs font-medium ring-1 ring-inset">
+                                ${token.isBlacklisted ? 'Blacklisté' : token.isRegistered ? 'Enregistré' : 'En attente'}
+                            </span>
+                        </td>
+                        <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
+                            <div class="flex justify-end gap-2">
+                                <button onclick="downloadStage0('${token.token}')" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300" title="Télécharger">
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                                ${!token.isBlacklisted ? `
+                                    <button onclick="blacklistToken(${token.id})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300" title="Blacklister">
+                                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                ` : `
+                                    <button onclick="unblacklistToken(${token.id})" class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300" title="Retirer de la blacklist">
+                                        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                `}
+                                <button onclick="deleteToken(${token.id})" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300" title="Supprimer">
+                                    <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tokenList.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Erreur:', error);
+                showNotification('Erreur lors du chargement des tokens', 'error');
+                throw error; // Propager l'erreur pour la gestion dans refreshTokens
+            }
+        }
+
+        // Modifier les fonctions existantes pour mettre à jour l'heure après chaque action
+        async function blacklistToken(tokenId) {
+            if (!confirm('Êtes-vous sûr de vouloir blacklister ce token ? Cette action est irréversible.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/tokens/${tokenId}/blacklist`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Erreur lors du blacklist du token');
+                }
+                
+                showNotification('Token blacklisté avec succès');
+                await refreshTokens();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        }
+
+        async function unblacklistToken(tokenId) {
+            if (!confirm('Êtes-vous sûr de vouloir retirer ce token de la blacklist ?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/tokens/${tokenId}/unblacklist`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Erreur lors du retrait de la blacklist');
+                }
+                
+                showNotification('Token retiré de la blacklist avec succès');
+                await refreshTokens();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        }
+
+        async function deleteToken(tokenId) {
+            if (!confirm('Êtes-vous sûr de vouloir supprimer ce token ? Cette action est irréversible.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/tokens/${tokenId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Erreur lors de la suppression du token');
+                }
+                
+                showNotification('Token supprimé avec succès');
+                await refreshTokens();
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        }
+
+        async function downloadStage0(token) {
+            try {
+                const response = await fetch(`/download_stage0/${token}`);
+                if (!response.ok) {
+                    throw new Error('Erreur lors du téléchargement');
+                }
+                
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = 'stage0.exe';
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+                    if (filenameMatch) {
+                        filename = filenameMatch[1];
+                    }
+                }
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                showNotification('Erreur lors du téléchargement: ' + error.message, 'error');
+            }
+        }
+
+        // Charger les tokens au démarrage et démarrer le rafraîchissement automatique
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshTokens();
+            startAutoRefresh();
+        });
+
+        // Arrêter le rafraîchissement automatique lorsque la page n'est pas visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopAutoRefresh();
+            } else {
+                startAutoRefresh();
+                refreshTokens();
+            }
+        });
+
+        // Gestion du thème
+        function setTheme(darkMode) {
+            if (darkMode) {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                document.getElementById('themeToggleLightIcon').classList.remove('hidden');
+                document.getElementById('themeToggleDarkIcon').classList.add('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                document.getElementById('themeToggleLightIcon').classList.add('hidden');
+                document.getElementById('themeToggleDarkIcon').classList.remove('hidden');
+            }
+        }
+
+        // Initialisation du thème
+        function initTheme() {
+            const theme = localStorage.getItem('theme');
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                setTheme(true);
+            } else {
+                setTheme(false);
+            }
+        }
+
+        // Gestionnaire de clic sur le bouton de thème
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark');
+            setTheme(!isDark);
+        });
+
+        // Initialiser le thème au chargement
+        initTheme();
+
+        // Gestion du mode MultiToken
+        const multiTokenSwitch = document.getElementById('multiTokenMode');
+        const multiTokenConfig = document.getElementById('multiTokenConfig');
+        const timeBasedMode = document.getElementById('timeBasedMode');
+        const timeBasedConfig = document.getElementById('timeBasedConfig');
+        const numberBasedConfig = document.getElementById('numberBasedConfig');
+
+        // Gestion du switch MultiToken
+        multiTokenSwitch.addEventListener('change', function() {
+            if (this.checked) {
+                multiTokenConfig.classList.remove('hidden');
+            } else {
+                multiTokenConfig.classList.add('hidden');
+            }
+        });
+
+        // Gestion du switch mode temporel/numérique
+        timeBasedMode.addEventListener('change', function() {
+            if (this.checked) {
+                timeBasedConfig.classList.remove('hidden');
+                numberBasedConfig.classList.add('hidden');
+                // Mettre à jour la date minimale
+                updateMinDate();
+            } else {
+                timeBasedConfig.classList.add('hidden');
+                numberBasedConfig.classList.remove('hidden');
+            }
+        });
+
+        // Fonction pour mettre à jour la date minimale
+        function updateMinDate() {
+            const now = new Date();
+            // Ajouter une minute pour éviter les problèmes de secondes
+            now.setMinutes(now.getMinutes() + 1);
+            const minDate = now.toISOString().slice(0, 16);
+            document.getElementById('validityDate').min = minDate;
+            // Définir la valeur par défaut à 24h dans le futur
+            now.setHours(now.getHours() + 24);
+            const defaultDate = now.toISOString().slice(0, 16);
+            document.getElementById('validityDate').value = defaultDate;
+        }
+
+        // Mettre à jour la date minimale au chargement de la page
+        document.addEventListener('DOMContentLoaded', updateMinDate);
+    </script>
+</body>
+</html> 
