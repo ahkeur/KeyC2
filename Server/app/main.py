@@ -14,6 +14,7 @@ from datetime import datetime
 from fastapi.responses import FileResponse
 import json
 import random
+import platform
 
 # Configuration de la base de données
 DB_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
@@ -186,12 +187,19 @@ def compile_stage0(c_file_path: str, debug_mode: bool = False) -> tuple[bool, st
         tuple[bool, str, str]: (succès, message d'erreur ou chemin de l'exécutable, logs de compilation)
     """
     try:
-        # Vérifier si gcc est disponible
+        # Détecter l'OS
+        system = platform.system()
+        if system == "Windows":
+            compiler = "gcc"
+        else:
+            compiler = "x86_64-w64-mingw32-gcc"  # MinGW cross-compiler for Linux
+
+        # Vérifier si le compilateur est disponible
         try:
-            gcc_version = subprocess.run(['gcc', '--version'], capture_output=True, text=True, check=True)
-            print(f"\n[+] Compilateur GCC détecté:\n{gcc_version.stdout}")
+            gcc_version = subprocess.run([compiler, '--version'], capture_output=True, text=True, check=True)
+            print(f"\n[+] Compilateur {compiler} détecté:\n{gcc_version.stdout}")
         except (subprocess.SubprocessError, FileNotFoundError):
-            return False, "Le compilateur gcc n'est pas installé. Veuillez installer MinGW.", ""
+            return False, f"Le compilateur {compiler} n'est pas installé. Veuillez l'installer.", ""
 
         # Préparer les chemins
         output_dir = os.path.dirname(c_file_path)
@@ -199,7 +207,7 @@ def compile_stage0(c_file_path: str, debug_mode: bool = False) -> tuple[bool, st
         
         # Options de compilation pour une application Windows sans console
         compile_args = [
-            'gcc',
+            compiler,
             c_file_path,
             '-o', exe_path,
             '-O2',
